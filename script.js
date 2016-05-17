@@ -1,9 +1,10 @@
 window.onload = function(){
-	document.getElementById('menu').addEventListener('change', updateForm);	
+	document.getElementById('menu').addEventListener('change', updateForm, true);	
 }
 
 // Disables submission via pressing enter
 window.addEventListener('keydown',function(e){
+	e = e || window.event;
 	if(e.keyIdentifier=='U+000A'||e.keyIdentifier=='Enter'||e.keyCode==13){
 		if(e.target.nodeName=='INPUT'&&e.target.type=='text'){
 			e.preventDefault();
@@ -68,9 +69,9 @@ var replaceForm = function(response){
 	reqFilled = 0;
 	// Add event listeners to detect changes in new fields
 	for(i = 0; i < allReqs.length; i++){
-		allReqs[i].addEventListener('focus', beforeState);
-		allReqs[i].addEventListener('blur', fieldCompleted);
-		allReqs[i].addEventListener('keyup', checkField);
+		allReqs[i].addEventListener('focus', beforeState, true);
+		allReqs[i].addEventListener('blur', fieldCompleted, true);
+		allReqs[i].addEventListener('keyup', checkField, true);
 		if(allReqs[i].value)
 			reqFilled++;
 	}
@@ -78,12 +79,12 @@ var replaceForm = function(response){
 		return;
 	// Special event listeners for "Host" field, needed for toggling additional fields
 	if(document.title == 'Splunk Destination'){
-		document.getElementById('host').addEventListener('blur', toggleFields);
-		document.getElementById('host').addEventListener('keyup', checkField);
+		document.getElementById('host').addEventListener('blur', toggleFields, true);
+		document.getElementById('host').addEventListener('keyup', checkField, true);
 	}
 	else{
-		document.getElementById('host').removeEventListener('blur', toggleFields);
-		document.getElementById('host').removeEventListener('keyup', checkField);
+		document.getElementById('host').removeEventListener('blur', toggleFields, true);
+		document.getElementById('host').removeEventListener('keyup', checkField, true);
 	}
 };
 
@@ -97,8 +98,8 @@ var addSSH = function(response){
 	neededReq += reqForms.length;
 	// Add event listener for those forms as well
 	for(i = 0; i < reqForms.length; i++){
-		reqForms[i].addEventListener('focus', beforeState);
-		reqForms[i].addEventListener('blur', fieldCompleted);
+		reqForms[i].addEventListener('focus', beforeState, true);
+		reqForms[i].addEventListener('blur', fieldCompleted, true);
 		if(reqForms[i].value)
 			reqFilled++;
 	}
@@ -113,14 +114,16 @@ function removeSSH(){
 	for(i = 0; i < reqForms.length; i++){
 			if(reqForms[i].value)
 				reqFilled--;
-			reqForms[i].removeEventListener('focus', beforeState);
-			reqForms[i].removeEventListener('blur', fieldCompleted);
+			reqForms[i].removeEventListener('focus', beforeState, true);
+			reqForms[i].removeEventListener('blur', fieldCompleted, true);
 	}
 	document.getElementById('ssh').innerHTML = '';
 }
 
 // Toggles the SSH fields based on value of the "Host" field
 var toggleFields = function(e){
+	e = e || window.event;
+  var target = e.target || e.srcElement;
 	hostDOM = document.getElementById('host');
 	if(hostDOM.value != 'localhost'){
 		if(document.getElementById('ssh').innerHTML == ''){
@@ -135,6 +138,8 @@ var toggleFields = function(e){
 // Extra precaution to make sure empty required fields and future empty fields (such as those added from changing "Host" field)
 // are not submitted by mistake
 var checkField = function(e){
+	e = e || window.event;
+  var target = e.target || e.srcElement;
 	if(!e.value || (e.srcElement.getAttribute('id') == 'host' && e.srcElement.value != 'localhost')){
 		document.getElementById('save').disabled = true;
 	}
@@ -142,13 +147,15 @@ var checkField = function(e){
 
 // Helper function to keep track of orginal field value before changing it
 var beforeState = function(e){
-	var target = e.srcElement;
+	e = e || window.event;
+  var target = e.target || e.srcElement;
 	initialValue = target.value;
 };
 
 // Update count of filled required fields based on the field's value
 var fieldCompleted = function(e){
-	var target = e.srcElement;
+	e = e || window.event;
+  var target = e.target || e.srcElement;
 	if(target.getAttribute('id') == 'host' && target.value != 'localhost'){
 		document.getElementById('save').disabled = true;
 		target.style.border = "1px red solid";
