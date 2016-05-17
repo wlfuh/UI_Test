@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div id="theForm">
+      <form>
+        <label>Name <span class="req">*</span></label>
+        <input type="text" placeholder="Name" class="isReq">
+        <br> <br> 
+        <label>Version</label>
+        <select>
+          <option value="6.2" selected>6.2</option>
+        </select>
+        <br> <br> 
+        <label>Integration type</label>
+				<select>
+          <option value="app" selected>app</option>
+        </select>
+        <br> <br> 
+        <label>Host <span class="req">*</span> </label>
+        <input type="text" placeholder="Name" id="host" class="isReq">
+        <br> <br> 
+        <div id="ssh"></div>
+        <label>Splunk home <span class="req">*</span> </label>
+        <input type="text" placeholder="Port" value="/opt/splunk" class="isReq">
+        <br> <br> 
+        <label>Filter <span class="help"></span></label>
+        <textarea></textarea>
+        <br>
+        <label class="note"><span class="req">*</span> is required field</label>
+         <br> 
+         <input type="submit" value="Save" id="save" disabled>
+    </form>
+    </div>
+  </body>
+
+</html>
