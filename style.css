@@ -12,7 +12,7 @@
 /* Specific style for FireFox*/
 @-moz-document url-prefix() { 
   .note {
-     top:561px;
+     top: 604px;
   }
 }
 body{
