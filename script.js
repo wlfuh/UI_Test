@@ -21,6 +21,7 @@ var neededReq = -1, reqFilled = -1, initialValue;
 var updateForm = function(e){
 	var menu = document.getElementById('menu');
 	var menuText = menu.options[menu.selectedIndex].text;
+	removeAlert();
 	if(menuText == 'No selection')
 		document.title = 'UI Test';
 	else
@@ -148,6 +149,28 @@ var beforeState = function(e){
 // Update count of filled required fields based on the field's value
 var fieldCompleted = function(e){
 	var target = e.srcElement;
+	if(target.getAttribute('id') == 'host' && target.value != 'localhost'){
+		document.getElementById('save').disabled = true;
+		target.style.border = "1px red solid";
+	  updateAlert('Host can only be "localhost"');
+		return;
+	}
+	if(target.getAttribute('id') == 'host' && target.value == 'localhost'){
+		target.style.border = "";
+		removeAlert();
+	}
+	if(target.getAttribute('name') == 'port'){
+		for(i = 0; i < target.value.length; i++){
+			if(target.value.charCodeAt(i) < 48 || target.value.charCodeAt(i) > 57){
+				target.style.border = "1px red solid";
+				updateAlert('Port must be an integer');
+				document.getElementById('save').disabled = true;
+				return;
+				}	
+		}
+		target.style.border = "";
+		removeAlert();
+	}
 	if(target.value && !initialValue)
 		reqFilled++;
 	if(!target.value && initialValue)
@@ -157,5 +180,16 @@ var fieldCompleted = function(e){
 
 // Enable/ Disable button if all required fields filled
 function checkCompletion(){
-	document.getElementById('save').disabled = reqFilled != neededReq;
+	document.getElementById('save').disabled = reqFilled != neededReq && document.getElementById('alert').style.visibility == "visible";
+}
+
+function updateAlert(message){
+	var alert = document.getElementById('alert');
+	alert.style.visibility="visible";
+	alert.innerHTML = message;	
+}
+
+function removeAlert(){
+	var alert = document.getElementById('alert');
+	alert.style.visibility="hidden";
 }

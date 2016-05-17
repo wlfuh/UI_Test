@@ -18,6 +18,15 @@
 body{
 	 font:17px/1.4 'Roboto', Arial, Verdana, Helvetica, sans-serif;
 }
+#alert{
+	color: #990000;
+	background:#FFB3B3;
+	visibility:hidden;
+	height: 23px;
+	padding: 5px;
+	margin-bottom: 14px;
+	border-radius: 5px;
+}
 .req{
 	color: #C24646;
 }
@@ -35,7 +44,7 @@ label{
  position: relative;
  float: right;
  right: 487px;
- bottom: 3px;
+ bottom: -2px;
 }
 select, input, textarea{
 	position:absolute;
@@ -99,7 +108,7 @@ input[type=submit]{
 	white-space: nowrap;
 	margin-right: 16px;
 	height: 27px;
-	line-height: 27px;
+	line-height: 18px;
 	min-width: 54px;
 	outline: 0px;
 	padding: 0 8px;
