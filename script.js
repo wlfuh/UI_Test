@@ -13,16 +13,17 @@ window.addEventListener('keydown',function(e){
 	}
 },true);
 
-// Variables that keep count of filled forms
-// More efficient method than constantly checking all required fields
-var neededReq = -1, reqFilled = -1, initialValue;
+var initialValue;
 
 // Implementation of the dropdown menu
 // Calls getHTML to add form to page based on choice
 var updateForm = function(e){
 	var menu = document.getElementById('menu');
 	var menuText = menu.options[menu.selectedIndex].text;
-	removeAlert();
+	var alerts = document.getElementsByClassName('alerts');
+	for(i = 0; i < alerts.length; i++){
+		removeAlert(i);
+	}
 	if(menuText == 'No selection')
 		document.title = 'UI Test';
 	else
@@ -65,15 +66,11 @@ var replaceForm = function(response){
 	var newContent = response.getElementById('theForm');
 	currentContent.innerHTML = newContent.innerHTML;
 	var allReqs = document.getElementsByClassName('isReq');
-	neededReq = allReqs.length;
-	reqFilled = 0;
 	// Add event listeners to detect changes in new fields
 	for(i = 0; i < allReqs.length; i++){
 		allReqs[i].addEventListener('focus', beforeState, true);
 		allReqs[i].addEventListener('blur', fieldCompleted, true);
 		allReqs[i].addEventListener('keyup', checkField, true);
-		if(allReqs[i].value)
-			reqFilled++;
 	}
 	if(!document.getElementById('host'))
 		return;
@@ -95,13 +92,10 @@ var addSSH = function(response){
 	var newContent = response.getElementById('sshForm');
 	currentContent.innerHTML = newContent.innerHTML;
 	var reqForms = currentContent.getElementsByClassName('isReq');
-	neededReq += reqForms.length;
 	// Add event listener for those forms as well
 	for(i = 0; i < reqForms.length; i++){
 		reqForms[i].addEventListener('focus', beforeState, true);
 		reqForms[i].addEventListener('blur', fieldCompleted, true);
-		if(reqForms[i].value)
-			reqFilled++;
 	}
 };
 
@@ -110,10 +104,7 @@ var addSSH = function(response){
 function removeSSH(){
 	var currentContent = document.getElementById('ssh');
 	var reqForms = currentContent.getElementsByClassName('isReq');
-	neededReq -= reqForms.length;
 	for(i = 0; i < reqForms.length; i++){
-			if(reqForms[i].value)
-				reqFilled--;
 			reqForms[i].removeEventListener('focus', beforeState, true);
 			reqForms[i].removeEventListener('blur', fieldCompleted, true);
 	}
@@ -159,44 +150,74 @@ var fieldCompleted = function(e){
 	if(target.getAttribute('id') == 'host' && target.value != 'localhost'){
 		document.getElementById('save').disabled = true;
 		target.style.border = "1px red solid";
-	  updateAlert('Host can only be "localhost"');
+	  updateAlert('Host can only be "localhost"', 0);
 		return;
 	}
 	if(target.getAttribute('id') == 'host' && target.value == 'localhost'){
 		target.style.border = "";
-		removeAlert();
+		removeAlert(0);
 	}
 	if(target.getAttribute('name') == 'port'){
-		for(i = 0; i < target.value.length; i++){
-			if(target.value.charCodeAt(i) < 48 || target.value.charCodeAt(i) > 57){
-				target.style.border = "1px red solid";
-				updateAlert('Port must be an integer');
-				document.getElementById('save').disabled = true;
-				return;
-				}	
+		if(!isInteger(target.value)){
+			target.style.border = "1px red solid";
+			updateAlert('Port must be an integer', 1);
+			document.getElementById('save').disabled = true;
+			return;
 		}
 		target.style.border = "";
-		removeAlert();
+		removeAlert(1);
 	}
-	if(target.value && !initialValue)
-		reqFilled++;
-	if(!target.value && initialValue)
-		reqFilled--;
 	checkCompletion();
 };
 
-// Enable/ Disable button if all required fields filled
+// Enable/ Disable button if all required fields filled and there are no warnings
 function checkCompletion(){
-	document.getElementById('save').disabled = reqFilled != neededReq && document.getElementById('alert').style.visibility == "visible";
+	var saveButton = document.getElementById('save');
+	var allReqs = document.getElementsByClassName('isReq');
+	var alerts = document.getElementsByClassName('alert');
+	for(i = 0; i < alerts.length; i++){
+		if(alerts[i].style.visibility == "visible"){
+			saveButton.disabled = true;
+			return;
+		}
+	}
+	for(i = 0; i < allReqs.length; i++){
+		if(!allReqs[i].value){
+			saveButton.disabled = true;
+			return;	
+		}
+	}
+	saveButton.disabled = false;
 }
 
-function updateAlert(message){
-	var alert = document.getElementById('alert');
+// Add error message
+// id: 0 - host 1 - port
+function updateAlert(message, id){
+	if(id >= document.getElementsByClassName('alert').length)
+		return;
+	var alert = document.getElementsByClassName('alert')[id];
 	alert.style.visibility="visible";
 	alert.innerHTML = message;	
 }
 
-function removeAlert(){
-	var alert = document.getElementById('alert');
+// Remove error message
+// id: 0 - host 1 - port
+function removeAlert(id){
+	var port = document.getElementsByName('port')[0] , host = document.getElementById('host');
+	if(id == 0 && host && host.value != 'localhost')
+		return;
+	if(id == 1 && port && !isInteger(port.value))
+		return;
+	var alert = document.getElementsByClassName('alert')[id];
 	alert.style.visibility="hidden";
+}
+
+// Check if input is an integer
+function isInteger(input){
+	for(i = 0; i < input.length; i++){
+			if(input.charCodeAt(i) < 48 || input.charCodeAt(i) > 57){
+				return false;
+			}	
+	}
+	return true;
 }

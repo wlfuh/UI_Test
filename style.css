@@ -18,7 +18,7 @@
 body{
 	 font:17px/1.4 'Roboto', Arial, Verdana, Helvetica, sans-serif;
 }
-#alert{
+.alert{
 	color: #990000;
 	background:#FFB3B3;
 	visibility:hidden;
